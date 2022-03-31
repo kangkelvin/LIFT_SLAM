@@ -10,7 +10,7 @@ export OMP_NUM_THREADS=1
 export CUDA_VISIBLE_DEVICES=0
 
 # Theano Flags 
-export THEANO_FLAGS="device=gpu0,${THEANO_FLAGS}"
+export THEANO_FLAGS="device=cuda*,${THEANO_FLAGS}"
 
 # ------------------------------------------------------------
 # LIFT code settings
@@ -62,7 +62,7 @@ _LIFT_DESC_FILE_NAME="${_LIFT_RES_DIR}/${_LIFT_TEST_IMG_NAME}_desc.h5"
 
 
 (cd $_LIFT_PYTHON_CODE_PATH; \
- python compute_detector.py \
+ python3 compute_detector.py \
 	$_LIFT_TEST_CONFIG \
 	$_LIFT_TEST_IMG \
 	$_LIFT_KP_FILE_NAME \
@@ -74,7 +74,7 @@ _LIFT_DESC_FILE_NAME="${_LIFT_RES_DIR}/${_LIFT_TEST_IMG_NAME}_desc.h5"
  )
 
 (cd $_LIFT_PYTHON_CODE_PATH; \
- python compute_orientation.py \
+ python3 compute_orientation.py \
 	$_LIFT_TEST_CONFIG \
 	$_LIFT_TEST_IMG \
 	$_LIFT_KP_FILE_NAME \
@@ -85,7 +85,7 @@ _LIFT_DESC_FILE_NAME="${_LIFT_RES_DIR}/${_LIFT_TEST_IMG_NAME}_desc.h5"
 )
 
 (cd $_LIFT_PYTHON_CODE_PATH; \
- python compute_descriptor.py \
+ python3 compute_descriptor.py \
 	$_LIFT_TEST_CONFIG \
 	$_LIFT_TEST_IMG \
 	$_LIFT_ORI_FILE_NAME \
