@@ -23,7 +23,7 @@ _LIFT_SAVE_PNG=1
 
 # Whether the use Theano when keypoint testing. CuDNN is required when turned
 # on
-_LIFT_USE_THEANO=1
+_LIFT_USE_THEANO=0
 
 # The base path of the code
 export _LIFT_BASE_PATH="$(pwd)"
@@ -49,8 +49,8 @@ then
 fi
 
 # Test image and model settings
-_LIFT_TEST_IMG_NAME="img1"
-_LIFT_TEST_IMG="${_LIFT_BASE_PATH}/data/testimg/${_LIFT_TEST_IMG_NAME}.jpg"
+_LIFT_TEST_IMG_NAME="000199"
+_LIFT_TEST_IMG="${_LIFT_BASE_PATH}/data/testimg/${_LIFT_TEST_IMG_NAME}.png"
 _LIFT_TEST_CONFIG="${_LIFT_BASE_PATH}/models/configs/picc-finetune-nopair.config"
 _LIFT_MODEL_DIR="${_LIFT_BASE_PATH}/models/picc-best/"
 

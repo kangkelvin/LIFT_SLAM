@@ -286,7 +286,7 @@ if __name__ == '__main__':
         if cv2.__version__[0] == '3':
             linetype = cv2.LINE_AA
         else:
-            linetype = cv2.CV_AA
+            linetype = cv2.LINE_AA
         [cv2.circle(image_color, tuple(np.round(pos).astype(int)),
                     np.round(rad * 6.0).astype(int), (0, 255, 0), 2,
                     lineType=linetype)
