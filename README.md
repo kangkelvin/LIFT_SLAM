@@ -173,7 +173,7 @@ After LIFT detector step, you get keypoints list, which is list[array], list len
 
 ```
 XYZS
-X (col),      Y (row),       scale,     S??
+X (col),      Y (row),       scale,     angle
 [290.65896909 227.5774079    1.43058658 145.80065918]
 kp_list
 [2.90658969e+02 2.27577408e+02 1.43058658e+00 0.00000000e+00
@@ -185,5 +185,14 @@ new_kp_list
   1.45800659e+02  8.38860800e+06  4.88620528e-01  0.00000000e+00
   4.88620528e-01 -1.62137780e-01 -1.42136881e+00  1.42136881e+00
  -1.62137780e-01]
+ 
+ # Keypoint List Structure Index Info
+IDX_X, IDX_Y, IDX_SIZE, IDX_ANGLE, IDX_RESPONSE, IDX_OCTAVE = (
+    0, 1, 2, 3, 4, 5)  # , IDX_CLASSID not used
+IDX_a, IDX_b, IDX_c = (6, 7, 8)
+# NOTE the row-major colon-major adaptation here
+IDX_A0, IDX_A2, IDX_A1, IDX_A3 = (9, 10, 11, 12)
+# # IDX_CLASSID for KAZE
+# IDX_CLASSID = 13
 ```
 

@@ -45,9 +45,9 @@ import six
 import theano
 from lasagne.layers import FlattenLayer, InputLayer
 
-from Utils.lasagne_tools import (createConvtScaleSpaceLayer, createResizeLayer,
+from utils.lift_utils.lasagne_tools import (createConvtScaleSpaceLayer, createResizeLayer,
                                  createXYZCropLayer, createXYZTCropLayer)
-from Utils.networks.eccv_base import ECCVNetworkBase, ECCVNetworkConfigBase
+from utils.lift_utils.networks.eccv_base import ECCVNetworkBase, ECCVNetworkConfigBase
 
 # Disable future warnings (caused by theano)
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -152,7 +152,7 @@ class Network(ECCVNetworkBase):
         # Import module
         sDetector = getattr(self.config, 'sDetector', 'tilde')
         detector_module = importlib.import_module(
-            'Utils.networks.detector.' + sDetector)
+            'utils.lift_utils.networks.detector.' + sDetector)
 
         # Run build
         detector_module.build(self, idxSiam, verbose)
@@ -184,7 +184,7 @@ class Network(ECCVNetworkBase):
         # Import module
         sOrientation = getattr(self.config, 'sOrientation', 'cvpr16')
         orientation_module = importlib.import_module(
-            'Utils.networks.orientation.' + sOrientation)
+            'utils.lift_utils.networks.orientation.' + sOrientation)
 
         # Run build
         orientation_module.build(self, idxSiam, verbose)
@@ -217,7 +217,7 @@ class Network(ECCVNetworkBase):
         # Import module
         sDescriptor = getattr(self.config, 'sDescriptor', 'norm_patch')
         descriptor_module = importlib.import_module(
-            'Utils.networks.descriptor.' + sDescriptor)
+            'utils.lift_utils.networks.descriptor.' + sDescriptor)
 
         # Run build
         descriptor_module.build(self, idxSiam, verbose)

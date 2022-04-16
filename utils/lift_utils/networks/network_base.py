@@ -45,7 +45,7 @@ import theano
 import theano.tensor as T
 
 from six.moves import xrange
-from Utils.lasagne_tools import loadNetwork, loadNetworkWithConfig, saveNetwork
+from utils.lift_utils.lasagne_tools import loadNetwork, loadNetworkWithConfig, saveNetwork
 
 # from optimizer import *
 # from cost_n_grad import *

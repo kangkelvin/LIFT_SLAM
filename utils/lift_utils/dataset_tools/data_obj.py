@@ -37,10 +37,10 @@ import os
 import cv2
 import numpy as np
 
-from Utils.custom_types import pathConfig
-from Utils.dataset_tools.helper import load_patches
-from Utils.dump_tools import loadh5
-from Utils.kp_tools import IDX_ANGLE, loadKpListFromTxt
+from utils.lift_utils.custom_types import pathConfig
+from utils.lift_utils.dataset_tools.helper import load_patches
+from utils.lift_utils.dump_tools import loadh5
+from utils.lift_utils.kp_tools import IDX_ANGLE, loadKpListFromTxt
 
 number_of_process = 20
 
@@ -93,26 +93,34 @@ class data_obj(object):
                           image_file_name, kp_file_name):
 
         bUseColorImage = getattr(param.patch, "bUseColorImage", False)
-        if not bUseColorImage:
-            # If there is not gray image, load the color one and convert to
-            # gray
-            if os.path.exists(image_file_name.replace(
-                    "image_color", "image_gray"
-            )):
-                img = cv2.imread(image_file_name.replace(
-                    "image_color", "image_gray"
-                ), 0)
-                assert len(img.shape) == 2
+        # [Kelvin] Hack, pass the images directly
+        if isinstance(image_file_name, np.ndarray):
+            img = image_file_name
+            if bUseColorImage:
+                in_dim = 3
             else:
-                # read the image
-                img = cv2.cvtColor(cv2.imread(image_file_name),
-                                   cv2.COLOR_BGR2GRAY)
-            in_dim = 1
-
+                in_dim = 1
         else:
-            img = cv2.imread(image_file_name)
-            in_dim = 3
-            assert(img.shape[-1] == in_dim)
+            if not bUseColorImage:
+                # If there is not gray image, load the color one and convert to
+                # gray
+                if os.path.exists(image_file_name.replace(
+                        "image_color", "image_gray"
+                )):
+                    img = cv2.imread(image_file_name.replace(
+                        "image_color", "image_gray"
+                    ), 0)
+                    assert len(img.shape) == 2
+                else:
+                    # read the image
+                    img = cv2.cvtColor(cv2.imread(image_file_name),
+                                    cv2.COLOR_BGR2GRAY)
+                in_dim = 1
+
+            else:
+                img = cv2.imread(image_file_name)
+                in_dim = 3
+                assert(img.shape[-1] == in_dim)
 
         bTestWithTestMeanStd = getattr(
             param.validation, 'bTestWithTestMeanStd', False)
@@ -126,7 +134,11 @@ class data_obj(object):
                   "".format(np.min(img), np.max(img)))
 
         # load the keypoint informations
-        kp = np.asarray(loadKpListFromTxt(kp_file_name))
+        # [Kelvin] Hack, pass keypoints directly
+        if isinstance(kp_file_name, np.ndarray):
+            kp = kp_file_name
+        else:
+            kp = np.asarray(loadKpListFromTxt(kp_file_name))
 
         # Assign dummy values to y, ID, angle
         y = np.zeros((len(kp),))

@@ -41,7 +41,7 @@ def CreateNetwork(pathconf, param, train_data_in, valid_data_in, test_data_in):
     # Load proper network and set proper num_siamese (in the param!)
     # ------------------------------------------------------------------------
     network_module = importlib.import_module(
-        'Utils.networks.' + param.dataset.dataType.lower(
+        'utils.lift_utils.networks.' + param.dataset.dataType.lower(
         ) + '_' + param.model.modelType.lower())
 
     # ------------------------------------------------------------------------
@@ -89,7 +89,7 @@ def CreateNetwork4Image(pathconf, param, image, verbose=True):
     # Load proper network and set proper num_siamese (in the param!)
     # ------------------------------------------------------------------------
     network_module = importlib.import_module(
-        'Utils.networks.' + param.dataset.dataType.lower(
+        'utils.lift_utils.networks.' + param.dataset.dataType.lower(
         ) + '_' + param.model.modelType.lower())
 
     # ------------------------------------------------------------------------

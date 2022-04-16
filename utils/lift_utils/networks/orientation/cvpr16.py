@@ -44,8 +44,8 @@ from lasagne.layers import (Conv2DLayer, DenseLayer, DropoutLayer,
                             ExpressionLayer, MaxPool2DLayer, NonlinearityLayer)
 from lasagne.nonlinearities import rectify as relu
 
-import Utils.custom_theano as CT
-from Utils.ghh_pool import GHHFeaturePoolLayer
+import utils.lift_utils.custom_theano as CT
+from utils.lift_utils.ghh_pool import GHHFeaturePoolLayer
 
 # from lasagne.layers.dnn import Conv3DDNNLayer as Conv3DLayer
 

@@ -46,10 +46,10 @@ from flufl.lock import Lock
 from lasagne.layers import get_all_params, get_output, get_output_shape
 from parse import parse
 
-from Utils.dump_tools import loadh5, saveh5
-from Utils.lasagne_tools import (createXYZMapLayer, loadNetwork,
+from utils.lift_utils.dump_tools import loadh5, saveh5
+from utils.lift_utils.lasagne_tools import (createXYZMapLayer, loadNetwork,
                                  loadNetworkWithConfig)
-from Utils.networks.network_base import NetworkBase, NetworkConfigBase
+from utils.lift_utils.networks.network_base import NetworkBase, NetworkConfigBase
 
 # Disable future warnings (caused by theano)
 warnings.simplefilter(action="ignore", category=FutureWarning)

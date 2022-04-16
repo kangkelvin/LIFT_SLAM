@@ -46,8 +46,8 @@ from lasagne import nonlinearities
 from lasagne.layers import (Conv2DLayer, ExpressionLayer, FlattenLayer,
                             MaxPool2DLayer, NonlinearityLayer)
 
-import Utils.dump_tools as dt
-from Utils.lasagne_tools import LPPool2DLayer, SubtractiveNormalization2DLayer
+import utils.lift_utils.dump_tools as dt
+from utils.lift_utils.lasagne_tools import LPPool2DLayer, SubtractiveNormalization2DLayer
 
 floatX = theano.config.floatX
 

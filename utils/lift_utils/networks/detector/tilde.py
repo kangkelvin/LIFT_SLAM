@@ -46,8 +46,8 @@ from lasagne.layers import (DropoutLayer, ExpressionLayer, GaussianNoiseLayer,
                             NonlinearityLayer, get_output_shape)
 from lasagne.layers.dnn import Conv3DDNNLayer as Conv3DLayer
 
-from Utils.ghh_pool import GHHFeaturePoolLayer
-from Utils.lasagne_tools import createXYZMapLayer
+from utils.lift_utils.ghh_pool import GHHFeaturePoolLayer
+from utils.lift_utils.lasagne_tools import createXYZMapLayer
 
 # Disable future warnings (caused by theano)
 warnings.simplefilter(action="ignore", category=FutureWarning)

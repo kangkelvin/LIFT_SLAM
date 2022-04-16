@@ -44,9 +44,9 @@ from lasagne.layers.pool import pool_output_length
 from lasagne.utils import as_tuple
 from theano.tensor.signal.pool import pool_2d
 
-from Utils.custom_types import paramStruct, pathConfig
-from Utils.dump_tools import loadpklz
-from Utils.math_tools import (_lcn_make_coef, _subtractive_norm_make_coef,
+from utils.lift_utils.custom_types import paramStruct, pathConfig
+from utils.lift_utils.dump_tools import loadpklz
+from utils.lift_utils.math_tools import (_lcn_make_coef, _subtractive_norm_make_coef,
                               softargmax)
 
 floatX = theano.config.floatX
