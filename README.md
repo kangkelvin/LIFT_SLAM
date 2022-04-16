@@ -35,8 +35,11 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
 - #### Test
 
   ```
+  ./ORB_SLAM2_OG/Examples/Monocular/mono_kitti ORB_SLAM2_OG/Vocabulary/ORBvoc.txt ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
+  
+  ./ORB_SLAM2_OG/Examples/Monocular/mono_kitti ORB_SLAM2_OG/Vocabulary/ORBvoc.txt ORB_SLAM2_OG/Examples/Monocular/KITTI17.yaml data/17-Curved-highway-drive
   ```
-
+  
   
 
 ### LIFT
@@ -160,5 +163,27 @@ int nmatches = matcher.SearchByBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches
 
 In ORB_SLAM2_OG/src/Tracking.cc:775
 Optimizer::PoseOptimization(&mCurrentFrame);
+```
+
+
+
+## Kelvin's Notes
+
+After LIFT detector step, you get keypoints list, which is list[array], list length is based on `num_keypoint` and array length is (13, ) 
+
+```
+XYZS
+X (col),      Y (row),       scale,     S??
+[290.65896909 227.5774079    1.43058658 145.80065918]
+kp_list
+[2.90658969e+02 2.27577408e+02 1.43058658e+00 0.00000000e+00
+ 1.45800659e+02 8.38860800e+06 4.88620528e-01 0.00000000e+00
+ 4.88620528e-01 1.43058658e+00 0.00000000e+00 0.00000000e+00
+ 1.43058658e+00]
+new_kp_list
+[ 2.90658969e+02  2.27577408e+02  1.43058658e+00  2.63492310e+02
+  1.45800659e+02  8.38860800e+06  4.88620528e-01  0.00000000e+00
+  4.88620528e-01 -1.62137780e-01 -1.42136881e+00  1.42136881e+00
+ -1.62137780e-01]
 ```
 
