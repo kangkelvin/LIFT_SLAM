@@ -250,6 +250,17 @@ void Frame::ExtractORB(int flag, const cv::Mat &im)
         (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors);
     else
         (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
+    
+    auto kp = mvKeys[0];
+    std::cout << kp.angle << " " << kp.class_id << " " << kp.octave << " " << kp.pt.x << " " << kp.pt.y << " " << kp.response << " " << kp.size << "\n";
+
+    std::cout << "mvKeys size: " << mvKeys.size() << "\n";
+
+    auto s = mDescriptors.size();
+    std::cout << "mDescriptors shape:" << s.height << " " << s.width << "\n";
+    std::cout << "mat type:" << mDescriptors.type() << "\n";
+
+    cv::waitKey(0);
 }
 
 void Frame::SetPose(cv::Mat Tcw)

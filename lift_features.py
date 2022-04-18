@@ -24,7 +24,7 @@ def get_lift_features(img_in: np.ndarray):
     ### Parameters ###
     config_file = "models/configs/picc-finetune-nopair.config"
     model_dir = "models/picc-best/"
-    num_keypoint = 500
+    num_keypoint = 4000
     ##################
 
     ##############################################################
