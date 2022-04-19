@@ -24,7 +24,7 @@ def get_lift_features(img_in: np.ndarray):
     ### Parameters ###
     config_file = "models/configs/picc-finetune-nopair.config"
     model_dir = "models/picc-best/"
-    num_keypoint = 4000
+    num_keypoint = 500
     ##################
 
     ##############################################################
@@ -195,8 +195,8 @@ def draw_XYZS_to_img(XYZS, image_color):
         return image_color
 
 if __name__ == '__main__':
-    f_path_q = "data/04-Straight-Line-Drive/image_0/000000.png"
-    f_path_t = "data/04-Straight-Line-Drive/image_0/000001.png"
+    f_path_q = "data/04-Straight-Line-Drive/image_0/000101.png"
+    f_path_t = "data/04-Straight-Line-Drive/image_0/000100.png"
     # img_in_q = cv2.imread(f_path_q, cv2.IMREAD_GRAYSCALE)
     # image_color_q, new_kp_list_q, descs_q = get_lift_features(img_in_q)
     # print(descs.shape)
@@ -211,12 +211,15 @@ if __name__ == '__main__':
     query_img = cv2.imread(f_path_q)
     train_img = cv2.imread(f_path_t)
 
+    # query_img = query_img[:, 400:801, :]
+    # train_img = train_img[:, 400:801, :]
+
     # Convert it to grayscale
     query_img_bw = cv2.cvtColor(query_img, cv2.COLOR_BGR2GRAY)
     train_img_bw = cv2.cvtColor(train_img, cv2.COLOR_BGR2GRAY)
     
     # Initialize the ORB detector algorithm
-    # orb = cv2.ORB_create()
+    orb = cv2.ORB_create()
     
     # Now detect the keypoints and compute
     # the descriptors for the query image

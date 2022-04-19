@@ -21,6 +21,7 @@
 #include "Frame.h"
 #include "Converter.h"
 #include "ORBmatcher.h"
+#include "LiftUtils.h"
 #include <thread>
 
 namespace ORB_SLAM2

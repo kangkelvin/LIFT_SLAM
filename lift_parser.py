@@ -30,4 +30,3 @@ if __name__ == '__main__':
         # np.savetxt(str(out_desc_path[:-4]) + ".txt", desc)
         fs_kp.release()
         fs_desc.release()
-        break
