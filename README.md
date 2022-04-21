@@ -35,18 +35,16 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
 - #### Test
 
   ```
-  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
+  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_orb third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
   
-  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/06-2U-turns-same-road
-  
-  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI17.yaml data/17-Curved-highway-drive
-  
-  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_lift third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/test
+  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_lift third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
   ```
   
   
 
 ### LIFT
+
+- Create a separate conda env for this
 
 - #### OpenCV 3
 
@@ -56,8 +54,6 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
   pip install -r requirements.txt
   ```
 
-  
-
 - cudatoolkit (choose one)
 
   ```
@@ -65,20 +61,18 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
   conda install -c anaconda cudatoolkit=11.0
   ```
 
-  
-
-- Build
+- Build (No need, all Python)
 
   ```
-  ```
-
   
-
+  ```
+  
 - Test
 
   ```
+  python lift_features.py
   ```
-
+  
   
 
 ## Digging Through ORB-SLAM2
