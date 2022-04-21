@@ -15,7 +15,7 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
 
 - #### OpenCV 3 
 
-- #### Pangolin
+- #### [Pangolin](https://github.com/stevenlovegrove/Pangolin/releases/tag/v0.6)
 
   ```
   cd third-party/Pangolin-0.6
@@ -36,8 +36,6 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
 
   ```
   ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_orb third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
-  
-  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_lift third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
   ```
   
   
@@ -73,6 +71,27 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
   python lift_features.py
   ```
   
+
+
+
+## LIFT SLAM
+
+- Your KITTI data should be under `data/seq_n` from the root of this repo
+
+- Go to `lift_parser.py` and change the folder directory to the sequence you want
+
+  ```
+  main_dir = "data/04-Straight-Line-Drive"
+  ```
+
+  Run the script, it will precompute the keypoints and descriptions for all the frames, ~2hrs+
+
+- Run ORB SLAM with LIFT
+
+  ```
+  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_lift third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
+  ```
+
   
 
 ## Digging Through ORB-SLAM2
