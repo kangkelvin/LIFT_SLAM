@@ -10,12 +10,12 @@ import numpy as np
 from utils.lift_utils.custom_types import paramGroup, paramStruct, pathConfig
 from utils.lift_utils.dump_tools import loadh5
 from utils.lift_utils.filter_tools import apply_learned_filter_2_image_no_theano
-from utils.lift_utils.kp_tools import XYZS2kpList, get_XYZS_from_res_list, kp_list_2_opencv_kp_list
+from utils.lift_utils.kp_tools import XYZS2kpList, get_XYZS_from_res_list, kp_list_2_opencv_kp_list, IDX_ANGLE, update_affine
 from utils.lift_utils.sift_tools import recomputeOrientation
 from utils.lift_utils.solvers import Test
 from utils.lift_utils.dataset_tools.data_obj import data_obj
 
-def get_lift_features(img_in: np.ndarray):
+def get_lift_features(img_in: np.ndarray, convert_to_uint8: False):
     """
     img_in: grayscale image in np array format (H x W)
     return: image_overlay (colored img), keypoint location, keypoints descriptions
@@ -136,13 +136,61 @@ def get_lift_features(img_in: np.ndarray):
     # Sorted keypoint list
     kp_list = XYZS2kpList(XYZS)
     # Keypoint list with orientation computed
-    kp_list, _ = recomputeOrientation(img_in, kp_list,
-                                          bSingleOrientation=True)
+    # kp_list, _ = recomputeOrientation(img_in, kp_list,
+    #                                       bSingleOrientation=True)
 
-    # TODO kangkelvin: use learned orientation instead of SIFT
+    ##############################################################
+    # Compute Orientation with Learned Features
+    # Setup
+    param = paramStruct()
+    param.loadParam(config_file, verbose=False)
+    pathconf = pathConfig()
+    pathconf.setupTrain(param, 0)
+    pathconf.result = model_dir
+
+    param.model.sDetector = 'bypass'
+    # This ensures that you don't create unecessary scale space
+    param.model.fScaleList = np.array([1.0])
+    param.patch.fMaxScale = np.max(param.model.fScaleList)
+    # this ensures that you don't over eliminate features at boundaries
+    param.model.nPatchSize = int(np.round(param.model.nDescInputSize) *
+                                 np.sqrt(2))
+    param.patch.fRatioScale = (float(param.patch.nPatchSize) /
+                               float(param.model.nDescInputSize)) * 6.0
+    param.model.sDescriptor = 'bypass'
+
+    # add the mean and std of the learned model to the param
+    mean_std_file = pathconf.result + 'mean_std.h5'
+    mean_std_dict = loadh5(mean_std_file)
+    param.online = paramGroup()
+    setattr(param.online, 'mean_x', mean_std_dict['mean_x'])
+    setattr(param.online, 'std_x', mean_std_dict['std_x'])
+
+    # -------------------------------------------------------------------------
+    # Load data in the test format
+    kp_array = np.stack(kp_list)
+    test_data_in = data_obj(param, img_in, kp_array)
+
+    # -------------------------------------------------------------------------
+    # Test using the test function
+    _, oris, compile_time = Test(
+        pathconf, param, test_data_in, test_mode="ori")
+
+    # update keypoints and save as new
+    kp_array = test_data_in.coords
+    for idxkp in range(kp_array.shape[0]):
+        kp_array[idxkp][IDX_ANGLE] = oris[idxkp] * 180.0 / np.pi % 360.0
+        kp_array[idxkp] = update_affine(kp_array[idxkp])
 
     ##############################################################
     # Compute descriptor
+    # Setup
+    param = paramStruct()
+    param.loadParam(config_file, verbose=False)
+    pathconf = pathConfig()
+    pathconf.setupTrain(param, 0)
+    pathconf.result = model_dir
+
     setattr(param.model, "descriptor_export_folder", "models/base")
 
     # Modify the network so that we bypass the keypoint part and the
@@ -167,13 +215,21 @@ def get_lift_features(img_in: np.ndarray):
 
     # -------------------------------------------------------------------------
     # Load data in the test format
-    kp_array = np.stack(kp_list)
     test_data_in = data_obj(param, img_in, kp_array)
 
     # -------------------------------------------------------------------------
     # Test using the test function
     descs, _, compile_time = Test(
         pathconf, param, test_data_in, test_mode="desc")
+
+    if convert_to_uint8:
+        descs = descs * 255.0 / 4.0
+        descs = np.clip(descs, 0, 255)
+        descs = np.array(descs, dtype=np.ubyte)
+
+    kp_list = []
+    for i in range(kp_array.shape[0]):
+        kp_list.append(kp_array[i])
 
     return image_color, kp_list, descs
 
@@ -195,8 +251,9 @@ def draw_XYZS_to_img(XYZS, image_color):
         return image_color
 
 if __name__ == '__main__':
-    f_path_q = "data/04-Straight-Line-Drive/image_0/000101.png"
-    f_path_t = "data/04-Straight-Line-Drive/image_0/000100.png"
+    seq_name = "04-Straight-Line-Drive"
+    f_path_q = "data/" + seq_name + "/image_0/000101.png"
+    f_path_t = "data/" + seq_name + "/image_0/000100.png"
     # img_in_q = cv2.imread(f_path_q, cv2.IMREAD_GRAYSCALE)
     # image_color_q, new_kp_list_q, descs_q = get_lift_features(img_in_q)
     # print(descs.shape)
@@ -211,8 +268,8 @@ if __name__ == '__main__':
     query_img = cv2.imread(f_path_q)
     train_img = cv2.imread(f_path_t)
 
-    # query_img = query_img[:, 400:801, :]
-    # train_img = train_img[:, 400:801, :]
+    query_img = query_img[:, 400:801, :]
+    train_img = train_img[:, 400:801, :]
 
     # Convert it to grayscale
     query_img_bw = cv2.cvtColor(query_img, cv2.COLOR_BGR2GRAY)
@@ -231,19 +288,40 @@ if __name__ == '__main__':
     queryKeypoints = kp_list_2_opencv_kp_list(queryKeypoints)
     trainKeypoints = kp_list_2_opencv_kp_list(trainKeypoints)
 
+    # queryDescriptors = queryDescriptors * 255.0 / 4.0
+    # trainDescriptors = trainDescriptors * 255.0 / 4.0
+    # n_query_desc = queryDescriptors.shape[0]
+    # n_train_desc = trainDescriptors.shape[0]
+
+    # if n_query_desc < len(queryKeypoints):
+    #     queryKeypoints = queryKeypoints[:n_query_desc]
+    
+    # if n_train_desc < len(trainKeypoints):
+    #     trainKeypoints = trainKeypoints[:n_train_desc]
+
     # Initialize the Matcher for matching
     # the keypoints and then match the
     # keypoints
     matcher = cv2.BFMatcher()
-    matches = matcher.match(queryDescriptors,trainDescriptors)
+    # matches = matcher.match(queryDescriptors,trainDescriptors)
+    FLANN_INDEX_KDTREE = 1
+    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    search_params = dict(checks = 50)
+    flann = cv2.FlannBasedMatcher(index_params, search_params)
+    matches = flann.knnMatch(queryDescriptors,trainDescriptors,k=2)
     
+
+    good = []
+    for m,n in matches:
+        good.append([m])
+
     # draw the matches to the final image
     # containing both the images the drawMatches()
     # function takes both images and keypoints
     # and outputs the matched query image with
     # its train image
-    final_img = cv2.drawMatches(query_img, queryKeypoints,
-    train_img, trainKeypoints, matches[:40], None)
+    # final_img = cv2.drawMatches(query_img, queryKeypoints, train_img, trainKeypoints, matches[:40], None)
+    final_img = cv2.drawMatchesKnn(query_img, queryKeypoints, train_img, trainKeypoints, good[:40], None, flags=2)
     
     # final_img = cv2.resize(final_img, (1000,650))
     
