@@ -34,7 +34,7 @@ using namespace std;
 namespace ORB_SLAM2
 {
 
-const int ORBmatcher::TH_HIGH = 100;
+const int ORBmatcher::TH_HIGH = 255;
 const int ORBmatcher::TH_LOW = 50;
 const int ORBmatcher::HISTO_LENGTH = 30;
 
@@ -404,6 +404,7 @@ int ORBmatcher::SearchByProjection(KeyFrame* pKF, cv::Mat Scw, const vector<MapP
 
 int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f> &vbPrevMatched, vector<int> &vnMatches12, int windowSize)
 {
+    // std::cout << "hi\n";
     int nmatches=0;
     vnMatches12 = vector<int>(F1.mvKeysUn.size(),-1);
 
@@ -428,6 +429,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
             continue;
 
         cv::Mat d1 = F1.mDescriptors.row(i1);
+        // std::cout << "i1: " << i1 << " d1 = " << std::endl << " "  << d1 << std::endl << std::endl;
 
         int bestDist = INT_MAX;
         int bestDist2 = INT_MAX;

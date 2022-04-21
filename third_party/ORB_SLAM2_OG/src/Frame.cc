@@ -172,7 +172,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
 }
 
 
-Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
+Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, std::vector<cv::KeyPoint> &keypoints, cv::Mat &descs, bool runOrb)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth)
 {
@@ -188,8 +188,14 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
-    // ORB extraction
+    if (runOrb) {
+        // ORB extraction
     ExtractORB(0,imGray);
+    } else {
+        // LIFT extraction
+        mvKeys = keypoints;
+        mDescriptors = descs.clone();
+    }
 
     N = mvKeys.size();
 
@@ -251,17 +257,6 @@ void Frame::ExtractORB(int flag, const cv::Mat &im)
         (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors);
     else
         (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
-    
-    auto kp = mvKeys[0];
-    std::cout << kp.angle << " " << kp.class_id << " " << kp.octave << " " << kp.pt.x << " " << kp.pt.y << " " << kp.response << " " << kp.size << "\n";
-
-    std::cout << "mvKeys size: " << mvKeys.size() << "\n";
-
-    auto s = mDescriptors.size();
-    std::cout << "mDescriptors shape:" << s.height << " " << s.width << "\n";
-    std::cout << "mat type:" << mDescriptors.type() << "\n";
-
-    cv::waitKey(0);
 }
 
 void Frame::SetPose(cv::Mat Tcw)

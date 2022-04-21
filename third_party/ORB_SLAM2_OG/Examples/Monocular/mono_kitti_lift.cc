@@ -27,12 +27,13 @@
 
 #include<opencv2/core/core.hpp>
 
+#include "LiftUtils.h"
 #include"System.h"
 
 using namespace std;
 
 void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
-                vector<double> &vTimestamps);
+                vector<double> &vTimestamps, vector<string> &vstrImageIds);
 
 int main(int argc, char **argv)
 {
@@ -44,8 +45,10 @@ int main(int argc, char **argv)
 
     // Retrieve paths to images
     vector<string> vstrImageFilenames;
+    vector<string> vstrImageIds;
     vector<double> vTimestamps;
-    LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
+    string baseDirectory = string(argv[3]);
+    LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps, vstrImageIds);
 
     int nImages = vstrImageFilenames.size();
 
@@ -65,8 +68,16 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
+        auto keypoints = ReadKeypointFromXml(baseDirectory, vstrImageIds[ni]);
+        auto descs = ReadDescFromXml(baseDirectory, vstrImageIds[ni]);
+        // std::cout << keypoints[0].pt.x << std::endl;
+        // std::cout << descs.rows << " " << descs.cols << " " << int(descs.at<uint8_t>(0, 0)) << " " << descs.type() << std::endl;
+        // std::cout << vstrImageIds[ni] << "\n";
+        // std::cout << vstrImageFilenames[ni] << "\n";
         im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
         double tframe = vTimestamps[ni];
+
+        // break;
 
         if(im.empty())
         {
@@ -81,7 +92,7 @@ int main(int argc, char **argv)
 #endif
 
         // Pass the image to the SLAM system
-        SLAM.TrackMonocular(im,tframe);
+        SLAM.TrackMonocular(im,tframe, keypoints, descs, false);
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -124,7 +135,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps)
+void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps, vector<string> &vstrImageIds)
 {
     ifstream fTimes;
     string strPathTimeFile = strPathToSequence + "/times.txt";
@@ -147,11 +158,13 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
 
     const int nTimes = vTimestamps.size();
     vstrImageFilenames.resize(nTimes);
+    vstrImageIds.resize(nTimes);
 
     for(int i=0; i<nTimes; i++)
     {
         stringstream ss;
         ss << setfill('0') << setw(6) << i;
+        vstrImageIds[i] = ss.str();
         vstrImageFilenames[i] = strPrefixLeft + ss.str() + ".png";
     }
 }

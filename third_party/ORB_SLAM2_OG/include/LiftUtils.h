@@ -21,9 +21,10 @@
  * @param image_id 
  * @return cv::KeyPoint 
  */
-std::vector<cv::KeyPoint> ReadKeypointFromXml(string base_dir, string image_id) {
+std::vector<cv::KeyPoint> ReadKeypointFromXml(std::string base_dir, std::string image_id) {
     cv::FileStorage fs;
-    base_dir.append(file_name);
+    base_dir.append("/kp_0/");
+    base_dir.append(image_id);
     base_dir.append(".xml");
     fs.open(base_dir, cv::FileStorage::READ);
     if (!fs.isOpened()) {
@@ -33,52 +34,39 @@ std::vector<cv::KeyPoint> ReadKeypointFromXml(string base_dir, string image_id) 
     cv::Mat placeholder;
     fs["kp"] >> placeholder;
 
-    cv::Size kps_size = placeholder.size()
     int n_keypoints = placeholder.rows;
 
     std::vector<cv::KeyPoint> out;
 
-    for (r = 0; r < n_keypoints; r++) {
+    for (int r = 0; r < n_keypoints; r++) {
         cv::KeyPoint kp;
-        kp.pt.x = placeholder[r][0];
-        kp.pt.y = placeholder[r][1];
-        kp.size = placeholder[r][2];
-        kp.angle = placeholder[r][3];
-        kp.response = placeholder[r][4];
-        kp.octave = placeholder[r][5];
-        kp.class_id = -1
+        kp.pt.x = placeholder.at<double>(r, 0);
+        kp.pt.y = placeholder.at<double>(r, 1);
+        kp.size = placeholder.at<double>(r, 2) * 2.0;
+        kp.angle = placeholder.at<double>(r, 3);
+        kp.response = placeholder.at<double>(r, 4);
+        // kp.octave = placeholder.at<double>(r, 5);
+        kp.octave = 0.0;
+        kp.class_id = -1;
 
-        out.push_back(kp)
+        out.push_back(kp);
     }
 
-    return out
+    return out;
 }
 
-cv::Mat ReadDescFromXml(string base_dir, string image_id) {
-    static constexpr lift_to_orb_const = 255.0 / 4.0;
-    
+cv::Mat ReadDescFromXml(std::string base_dir, std::string image_id) {
     cv::FileStorage fs;
-    base_dir.append(file_name);
+    base_dir.append("/desc_0/");
+    base_dir.append(image_id);
     base_dir.append(".xml");
     fs.open(base_dir, cv::FileStorage::READ);
     if (!fs.isOpened()) {
         std::cout << "error in reading file: " << base_dir << std::endl;
     }
 
-    cv::Mat placeholder;
-    fs["desc"] >> placeholder;
+    cv::Mat out;
+    fs["desc"] >> out;
 
-    cv::Size desc_size = placeholder.size()
-    int n_keypoints = placeholder.rows;
-    int desc_len = placeholder.cols;
-
-    cv::Mat out_8u = cv::Mat(desc_size, cv::CV_8U);
-
-    for (int r = 0; r < n_keypoints; r++) {
-        for (int c = 0; c < desc_len; c++) {
-            out_8u[r][c] = std::max(std::min(int(placeholder[r][c] * lift_to_orb_const), 255), 0)
-        }
-    }
-
-    return out_8u
+    return out;
 }

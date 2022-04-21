@@ -6,6 +6,7 @@ from copy import deepcopy
 import cv2
 import h5py
 import numpy as np
+from regex import F
 
 from utils.lift_utils.custom_types import paramGroup, paramStruct, pathConfig
 from utils.lift_utils.dump_tools import loadh5
@@ -24,7 +25,7 @@ def get_lift_features(img_in: np.ndarray, convert_to_uint8: False):
     ### Parameters ###
     config_file = "models/configs/picc-finetune-nopair.config"
     model_dir = "models/picc-best/"
-    num_keypoint = 500
+    num_keypoint = 1000
     ##################
 
     ##############################################################
@@ -253,21 +254,12 @@ def draw_XYZS_to_img(XYZS, image_color):
 if __name__ == '__main__':
     seq_name = "04-Straight-Line-Drive"
     f_path_q = "data/" + seq_name + "/image_0/000101.png"
-    f_path_t = "data/" + seq_name + "/image_0/000100.png"
-    # img_in_q = cv2.imread(f_path_q, cv2.IMREAD_GRAYSCALE)
-    # image_color_q, new_kp_list_q, descs_q = get_lift_features(img_in_q)
-    # print(descs.shape)
-    # print(descs[0])
+    f_path_t = "data/" + seq_name + "/image_0/000100.png"   
     
-        
-    # Read the query image as query_img
-    # and train image This query image
-    # is what you need to find in train image
-    # Save it in the same directory
-    # with the name image.jpg 
+    # Read image
     query_img = cv2.imread(f_path_q)
     train_img = cv2.imread(f_path_t)
-
+    # Optional trim to make width smaller
     query_img = query_img[:, 400:801, :]
     train_img = train_img[:, 400:801, :]
 
@@ -275,55 +267,36 @@ if __name__ == '__main__':
     query_img_bw = cv2.cvtColor(query_img, cv2.COLOR_BGR2GRAY)
     train_img_bw = cv2.cvtColor(train_img, cv2.COLOR_BGR2GRAY)
     
-    # Initialize the ORB detector algorithm
-    orb = cv2.ORB_create()
-    
-    # Now detect the keypoints and compute
-    # the descriptors for the query image
-    # and train image
+    ### Use ORB
+    # orb = cv2.ORB_create()
     # queryKeypoints, queryDescriptors = orb.detectAndCompute(query_img_bw,None)
     # trainKeypoints, trainDescriptors = orb.detectAndCompute(train_img_bw,None)
-    _, queryKeypoints, queryDescriptors = get_lift_features(query_img_bw)
-    _, trainKeypoints, trainDescriptors = get_lift_features(train_img_bw)
+
+    ### Use Lift
+    _, queryKeypoints, queryDescriptors = get_lift_features(query_img_bw, False)
+    _, trainKeypoints, trainDescriptors = get_lift_features(train_img_bw, False)
     queryKeypoints = kp_list_2_opencv_kp_list(queryKeypoints)
     trainKeypoints = kp_list_2_opencv_kp_list(trainKeypoints)
 
-    # queryDescriptors = queryDescriptors * 255.0 / 4.0
-    # trainDescriptors = trainDescriptors * 255.0 / 4.0
-    # n_query_desc = queryDescriptors.shape[0]
-    # n_train_desc = trainDescriptors.shape[0]
-
-    # if n_query_desc < len(queryKeypoints):
-    #     queryKeypoints = queryKeypoints[:n_query_desc]
-    
-    # if n_train_desc < len(trainKeypoints):
-    #     trainKeypoints = trainKeypoints[:n_train_desc]
-
     # Initialize the Matcher for matching
-    # the keypoints and then match the
-    # keypoints
     matcher = cv2.BFMatcher()
-    # matches = matcher.match(queryDescriptors,trainDescriptors)
-    FLANN_INDEX_KDTREE = 1
-    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-    search_params = dict(checks = 50)
-    flann = cv2.FlannBasedMatcher(index_params, search_params)
-    matches = flann.knnMatch(queryDescriptors,trainDescriptors,k=2)
-    
 
-    good = []
-    for m,n in matches:
-        good.append([m])
+    ### Use simple brute force
+    matches = matcher.match(queryDescriptors,trainDescriptors)
+    final_img = cv2.drawMatches(query_img, queryKeypoints, train_img, trainKeypoints, matches[:40], None)
 
-    # draw the matches to the final image
-    # containing both the images the drawMatches()
-    # function takes both images and keypoints
-    # and outputs the matched query image with
-    # its train image
-    # final_img = cv2.drawMatches(query_img, queryKeypoints, train_img, trainKeypoints, matches[:40], None)
-    final_img = cv2.drawMatchesKnn(query_img, queryKeypoints, train_img, trainKeypoints, good[:40], None, flags=2)
-    
-    # final_img = cv2.resize(final_img, (1000,650))
+    ### Use FLANN
+    # FLANN_INDEX_KDTREE = 1
+    # index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    # search_params = dict(checks = 50)
+    # flann = cv2.FlannBasedMatcher(index_params, search_params)
+    # matches = flann.knnMatch(queryDescriptors,trainDescriptors,k=2)
+
+    # good = []
+    # for m,n in matches:
+    #     good.append([m])
+
+    # final_img = cv2.drawMatchesKnn(query_img, queryKeypoints, train_img, trainKeypoints, good[:40], None, flags=2)
     
     # Show the final image
     cv2.imshow("Matches", final_img)

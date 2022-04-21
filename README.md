@@ -39,8 +39,9 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
   
   ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/06-2U-turns-same-road
   
-  
   ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI17.yaml data/17-Curved-highway-drive
+  
+  ./third_party/ORB_SLAM2_OG/Examples/Monocular/mono_kitti_lift third_party/ORB_SLAM2_OG/Vocabulary/ORBvoc.txt third_party/ORB_SLAM2_OG/Examples/Monocular/KITTI04-12.yaml data/test
   ```
   
   
