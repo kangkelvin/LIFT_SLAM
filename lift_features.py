@@ -278,6 +278,9 @@ if __name__ == '__main__':
     queryKeypoints = kp_list_2_opencv_kp_list(queryKeypoints)
     trainKeypoints = kp_list_2_opencv_kp_list(trainKeypoints)
 
+    ### See features only
+    # query_img = cv2.drawKeypoints(query_img_bw, queryKeypoints[:500], query_img)
+
     # Initialize the Matcher for matching
     matcher = cv2.BFMatcher()
 

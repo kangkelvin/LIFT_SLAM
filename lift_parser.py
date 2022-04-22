@@ -6,7 +6,7 @@ import os
 
 if __name__ == '__main__':
     ### Parameters
-    main_dir = "data/04-Straight-Line-Drive"
+    main_dir = "data/06-2U-turns-same-road"
     ###
 
     img_dir = os.path.join(main_dir, "image_0/")

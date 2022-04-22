@@ -316,7 +316,7 @@ void System::Shutdown()
     }
 
     if(mpViewer)
-        pangolin::BindToContext("ORB-SLAM2: Map Viewer");
+        pangolin::BindToContext("Map Viewer");
 }
 
 void System::SaveTrajectoryTUM(const string &filename)
