@@ -17,7 +17,7 @@ def find_nearest(array, value):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evaluation SLAM Keyframes on KITTI Ground Truth')
-    parser.add_argument('--sequence', type=int, default=4)
+    parser.add_argument('--sequence', type=int, default=6)
     parser.add_argument('--feature_type', type=str, default="LIFT")
     args = parser.parse_args()
     print(args)
@@ -86,38 +86,31 @@ if __name__ == "__main__":
     pred_r = R.from_matrix(result_poses[0][0:3,0:3])
     match_transform[0:3,0:3] = (gt_r * pred_r.inv()).as_matrix()
     
-    total_error = 0.0
+    # Building A & b to solve for scaling factor with Ax=b
+    A = np.array([])
+    b = np.array([])
+    result_xyz = [[]]
+    gt_xyz = [[]]
     for frame in range(len(result_poses)):
         idx, value = find_nearest(gt_times,result_times[frame])
         
         transformed_result_pose = match_transform @ result_poses[frame]
-        euclidean_error = np.linalg.norm(gt_poses[idx][0:3,3] - transformed_result_pose[0:3,3])
-        total_error += euclidean_error
-        # print(euclidean_error)
+        result_xyz.append(transformed_result_pose[0:3,3])
+        gt_xyz.append(gt_poses[idx][0:3,3])
         
-        # Interpolate gt_frames by time to match the timestamp on the result pose
-        #   for more accurate comparison for error. Calculate error as the euclidean
-        #   distance between the matrix elements.
-        # Code for interpolating, turns out twasn't needed
-        # gt_idxs = [0,0]
-        # if value < result_times[frame]:
-        #     gt_idxs = [idx, min(idx+1, len(gt_times)-1)]
-        # elif value > result_times[frame]:
-        #     gt_idxs = [max(0,idx-1), idx]
-        # else:
-        #     gt_idxs [idx,idx]
-        # print(result_times[frame], gt_idxs, gt_times[gt_idxs[0]], gt_times[gt_idxs[1]])
+        A = np.append(A,transformed_result_pose[0:3,3])
+        b = np.append(b,gt_poses[idx][0:3,3])
         
-        # if gt_idxs[0] == gt_idxs[1]: # Catch if result time is outside range of gt_times, just pick beginning or end frame
-        #     interpolated_gt_pose = gt_poses[idx]
-        # else:
-        #     interpolated_gt_pose = interpolate(result_times[frame], gt_times[gt_idxs[0]], gt_times[gt_idxs[1]], gt_poses[gt_idxs[0]], gt_poses[gt_idxs[1]])
-            
-        # print(result_times[frame], interpolated_gt_pose)
-        
-    mean_error = total_error/len(result_poses)
-    print("Total Error:", total_error)
-    print("Mean Error:", mean_error)
-            
-        
-        
+    A = A.reshape(-1,1)
+    b = b.reshape(-1,1)
+    x, res, rank, s = np.linalg.lstsq(A,b, rcond=None)
+    
+    l1norm = np.mean(np.abs(A*x-b))
+    print("l1norm:", l1norm)
+    
+    result_xyz = np.array(result_xyz[1:])
+    gt_xyz = np.array(gt_xyz[1:])
+    
+    l2norm = np.sqrt(np.mean(np.square(np.linalg.norm(result_xyz*x-gt_xyz,axis=1))))
+    print("l2norm:", l2norm)
+    
