@@ -1,12 +1,8 @@
-import os
-import sys
-import time
 from copy import deepcopy
 
 import cv2
-import h5py
+from scipy.stats import boxcox
 import numpy as np
-from regex import F
 
 from utils.lift_utils.custom_types import paramGroup, paramStruct, pathConfig
 from utils.lift_utils.dump_tools import loadh5
@@ -225,6 +221,9 @@ def get_lift_features(img_in: np.ndarray, convert_to_uint8: False):
 
     if convert_to_uint8:
         descs = descs * 255.0 / 4.0
+        # descs = (-1 * descs + 4.0)
+        # descs = np.log(descs)
+        # descs = (descs + 6.0) * 255.0 / 8.0
         descs = np.clip(descs, 0, 255)
         descs = np.array(descs, dtype=np.ubyte)
 
@@ -273,10 +272,18 @@ if __name__ == '__main__':
     # trainKeypoints, trainDescriptors = orb.detectAndCompute(train_img_bw,None)
 
     ### Use Lift
-    _, queryKeypoints, queryDescriptors = get_lift_features(query_img_bw, False)
-    _, trainKeypoints, trainDescriptors = get_lift_features(train_img_bw, False)
+    _, queryKeypoints, queryDescriptors = get_lift_features(query_img_bw, True)
+    _, trainKeypoints, trainDescriptors = get_lift_features(train_img_bw, True)
     queryKeypoints = kp_list_2_opencv_kp_list(queryKeypoints)
     trainKeypoints = kp_list_2_opencv_kp_list(trainKeypoints)
+
+    # import matplotlib.pyplot as plt
+    # n, bins, patches = plt.hist(x=queryDescriptors.flatten(), bins='auto', color='#0504aa',
+    #                             alpha=0.7)
+    # plt.grid(axis='y', alpha=0.75)
+    # plt.xlabel('Value')
+    # plt.ylabel('Frequency')
+    # plt.show()
 
     ### See features only
     # query_img = cv2.drawKeypoints(query_img_bw, queryKeypoints[:500], query_img)

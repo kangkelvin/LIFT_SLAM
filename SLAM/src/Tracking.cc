@@ -43,6 +43,8 @@ using namespace std;
 namespace ORB_SLAM2
 {
 
+const int TH_POINTS = 100;
+
 Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Map *pMap, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor):
     mState(NO_IMAGES_YET), mSensor(sensor), mbOnlyTracking(false), mbVO(false), mpORBVocabulary(pVoc),
     mpKeyFrameDB(pKFDB), mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys), mpViewer(NULL),
@@ -566,7 +568,7 @@ void Tracking::MonocularInitialization()
     if(!mpInitializer)
     {
         // Set Reference Frame
-        if(mCurrentFrame.mvKeys.size()>100)
+        if(mCurrentFrame.mvKeys.size()>TH_POINTS)
         {
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
@@ -587,7 +589,7 @@ void Tracking::MonocularInitialization()
     else
     {
         // Try to initialize
-        if((int)mCurrentFrame.mvKeys.size()<=100)
+        if((int)mCurrentFrame.mvKeys.size()<=TH_POINTS)
         {
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
@@ -597,13 +599,13 @@ void Tracking::MonocularInitialization()
 
         // Find correspondences
         ORBmatcher matcher(0.9,true);
-        int nmatches = matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
+        int nmatches = matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,TH_POINTS);
 
         std::cout << "init: " << nmatches << std::endl;
 
 
         // Check if there are enough correspondences
-        if(nmatches<100)
+        if(nmatches<TH_POINTS)
         {
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
@@ -692,7 +694,7 @@ void Tracking::CreateInitialMapMonocular()
     float medianDepth = pKFini->ComputeSceneMedianDepth(2);
     float invMedianDepth = 1.0f/medianDepth;
 
-    if(medianDepth<0 || pKFcur->TrackedMapPoints(1)<100)
+    if(medianDepth<0 || pKFcur->TrackedMapPoints(1)<TH_POINTS)
     {
         cout << "Wrong initialization, reseting..." << endl;
         Reset();
@@ -832,7 +834,7 @@ void Tracking::UpdateLastFrame()
     sort(vDepthIdx.begin(),vDepthIdx.end());
 
     // We insert all close points (depth<mThDepth)
-    // If less than 100 close points, we insert the 100 closest ones.
+    // If less than TH_POINTS close points, we insert the TH_POINTS closest ones.
     int nPoints = 0;
     for(size_t j=0; j<vDepthIdx.size();j++)
     {
@@ -863,7 +865,7 @@ void Tracking::UpdateLastFrame()
             nPoints++;
         }
 
-        if(vDepthIdx[j].first>mThDepth && nPoints>100)
+        if(vDepthIdx[j].first>mThDepth && nPoints>TH_POINTS)
             break;
     }
 }
@@ -1021,7 +1023,7 @@ bool Tracking::NeedNewKeyFrame()
         }
     }
 
-    bool bNeedToInsertClose = (nTrackedClose<100) && (nNonTrackedClose>70);
+    bool bNeedToInsertClose = (nTrackedClose<TH_POINTS) && (nNonTrackedClose>70);
 
     // Thresholds
     float thRefRatio = 0.75f;
@@ -1082,7 +1084,7 @@ void Tracking::CreateNewKeyFrame()
 
         // We sort points by the measured depth by the stereo/RGBD sensor.
         // We create all those MapPoints whose depth < mThDepth.
-        // If there are less than 100 close points we create the 100 closest.
+        // If there are less than TH_POINTS close points we create the TH_POINTS closest.
         vector<pair<float,int> > vDepthIdx;
         vDepthIdx.reserve(mCurrentFrame.N);
         for(int i=0; i<mCurrentFrame.N; i++)
@@ -1132,7 +1134,7 @@ void Tracking::CreateNewKeyFrame()
                     nPoints++;
                 }
 
-                if(vDepthIdx[j].first>mThDepth && nPoints>100)
+                if(vDepthIdx[j].first>mThDepth && nPoints>TH_POINTS)
                     break;
             }
         }
@@ -1455,7 +1457,7 @@ bool Tracking::Relocalization()
                 // If few inliers, search by projection in a coarse window and optimize again
                 if(nGood<50)
                 {
-                    int nadditional =matcher2.SearchByProjection(mCurrentFrame,vpCandidateKFs[i],sFound,10,100);
+                    int nadditional =matcher2.SearchByProjection(mCurrentFrame,vpCandidateKFs[i],sFound,10,TH_POINTS);
 
                     if(nadditional+nGood>=50)
                     {

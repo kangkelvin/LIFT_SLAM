@@ -90,6 +90,7 @@ sudo apt install libgl1-mesa-dev libglew-dev pkg-config libegl1-mesa-dev libwayl
   ```
   cd workspace
   ./SLAM/Examples/Monocular/mono_kitti_lift SLAM/Vocabulary/ORBvoc.txt SLAM/Examples/Monocular/KITTI04-12.yaml data/04-Straight-Line-Drive
+  ./SLAM/Examples/Monocular/mono_kitti_lift SLAM/Vocabulary/ORBvoc.txt SLAM/Examples/Monocular/KITTI04-12.yaml data/06-2U-turns-same-road
   ```
 
 - Evaluate

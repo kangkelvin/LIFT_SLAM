@@ -18,7 +18,7 @@ if __name__ == '__main__':
     if not os.path.exists(desc_dir):
         os.makedirs(desc_dir)
 
-    for image_path in os.listdir(img_dir):
+    for image_path in sorted(os.listdir(img_dir)):
         full_path = os.path.join(img_dir, image_path)
         query_img = cv2.imread(full_path)
         query_img_bw = cv2.cvtColor(query_img, cv2.COLOR_BGR2GRAY)

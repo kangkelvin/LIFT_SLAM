@@ -34,8 +34,8 @@ using namespace std;
 namespace ORB_SLAM2
 {
 
-const int ORBmatcher::TH_HIGH = 255; // 100
-const int ORBmatcher::TH_LOW = 50; // 50
+const int ORBmatcher::TH_HIGH = 400; // 100
+const int ORBmatcher::TH_LOW = 300; // 50
 const int ORBmatcher::HISTO_LENGTH = 30; // 30 60
 
 ORBmatcher::ORBmatcher(float nnratio, bool checkOri): mfNNratio(nnratio), mbCheckOrientation(checkOri)
@@ -1653,14 +1653,16 @@ int ORBmatcher::DescriptorDistance(const cv::Mat &a, const cv::Mat &b)
 
     int dist=0;
 
-    for(int i=0; i<8; i++, pa++, pb++)
+    for(int i=0; i<32; i++, pa++, pb++)
+    // for(int i=0; i<8; i++, pa++, pb++)
     {
         unsigned  int v = *pa ^ *pb;
         v = v - ((v >> 1) & 0x55555555);
         v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
         dist += (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
-
+    // dist /= 2.0;
+    // std::cout << dist << " ";
     return dist;
 }
 
