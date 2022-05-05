@@ -89,7 +89,8 @@ int FORB::distance(const FORB::TDescriptor &a,
 
   int dist=0;
 
-  for(int i=0; i<8; i++, pa++, pb++)
+  for(int i=0; i<32; i++, pa++, pb++)
+//   for(int i=0; i<8; i++, pa++, pb++)
   {
       unsigned  int v = *pa ^ *pb;
       v = v - ((v >> 1) & 0x55555555);
