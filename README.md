@@ -5,6 +5,8 @@
 
 LIFT SLAM is a hybrid SLAM that combines a learned feature detector and descriptor along with a classical SLAM back-end such as ORB SLAM.
 
+Read our report [here](16_833_Hybrid_SLAM__A_Comparison_between_ORB_SLAM_and_LIFT_SLAM.pdf)
+
 ## Installation
 
 Things to apt install
