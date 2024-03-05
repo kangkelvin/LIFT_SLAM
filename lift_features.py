@@ -8,7 +8,7 @@ from utils.lift_utils.custom_types import paramGroup, paramStruct, pathConfig
 from utils.lift_utils.dump_tools import loadh5
 from utils.lift_utils.filter_tools import apply_learned_filter_2_image_no_theano
 from utils.lift_utils.kp_tools import XYZS2kpList, get_XYZS_from_res_list, kp_list_2_opencv_kp_list, IDX_ANGLE, update_affine
-from utils.lift_utils.sift_tools import recomputeOrientation
+# from utils.lift_utils.sift_tools import recomputeOrientation
 from utils.lift_utils.solvers import Test
 from utils.lift_utils.dataset_tools.data_obj import data_obj
 
